@@ -4,6 +4,7 @@
 // *** MODIFICADO (v4) POR GEMINI PARA DAR PERMISOS DE GESTIÓN AL 'encargado' ***
 session_start();
 include 'conexion.php';
+include_once 'funciones_permisos.php';
 
 // 1. Proteger la página
 if (!isset($_SESSION['usuario_id'])) { header("Location: login.php"); exit(); }
@@ -12,7 +13,7 @@ $id_usuario = $_SESSION['usuario_id'];
 $rol_usuario = $_SESSION['usuario_rol'];
 // *** AÑADIDO: Definir el permiso de gestión para Admin O Encargado ***
 // (Esta línea es de tu código original y ahora la usaremos)
-$es_admin_o_encargado = in_array($rol_usuario, ['admin', 'encargado']);
+$es_admin_o_encargado = tiene_permiso('tareas_gestionar', $pdo);
 // *******************************************************************
 $id_tarea = (int)($_GET['id'] ?? 0);
 
@@ -51,11 +52,10 @@ try {
     // Protección para que un usuario no-admin/encargado no vea tareas ajenas
     // --- INICIO DE LA MODIFICACIÓN DE GEMINI (v4) ---
     // (Añadido !$es_admin_o_encargado para que el encargado pueda ver tareas aunque no esté asignado)
-    if (!$es_admin_o_encargado && !$es_tecnico_asignado && $rol_usuario !== 'auxiliar') { 
-    // --- FIN DE LA MODIFICACIÓN DE GEMINI (v5) ---
-        header("Location: tareas_lista.php?error=" . urlencode("Sin permiso.")); 
-        exit(); 
-    }
+    if (!$es_admin_o_encargado && !$es_tecnico_asignado && !tiene_permiso('tareas_ver_todas', $pdo)) { 
+    header("Location: tareas_lista.php?error=" . urlencode("Sin permiso.")); 
+    exit(); 
+}
 
     // (Fusión: Usamos las consultas de tarea_ver_r.php para la DB correcta)
     // Adjuntos Iniciales

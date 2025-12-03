@@ -4,11 +4,11 @@
 // *** MODIFICADO (v3) POR GEMINI PARA MOSTRAR MODAL DE ÉXITO ***
 session_start();
 include 'conexion.php';
+include_once 'funciones_permisos.php';
 
 // 1. Proteger la página (solo Admin O ENCARGADO puede editar tareas)
 // --- INICIO DE LA MODIFICACIÓN DE GEMINI (v2) ---
-if (!isset($_SESSION['usuario_id']) || !in_array($_SESSION['usuario_rol'], ['admin', 'encargado'])) {
-// --- FIN DE LA MODIFICACIÓN DE GEMINI (v2) ---
+if (!isset($_SESSION['usuario_id']) || (!tiene_permiso('tareas_gestionar', $pdo) && $_SESSION['usuario_rol'] !== 'admin')) {
     header("Location: dashboard.php");
     exit();
 }

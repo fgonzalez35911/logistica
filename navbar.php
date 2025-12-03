@@ -170,6 +170,10 @@ if ($id_usuario_nav > 0 && isset($pdo)) {
                 </li>
                 <?php endif; ?>
 
+                <?php 
+                // --- MODIFICACIÓN: PROTECCIÓN DE TAREAS CON PERMISO ---
+                if (tiene_permiso('ver_lista_tareas', $pdo)): 
+                ?>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle <?php echo (strpos(basename($_SERVER['PHP_SELF']), 'tarea_') !== false || basename($_SERVER['PHP_SELF']) == 'tareas_lista.php') ? 'active' : ''; ?>"
                         href="#" id="tareasDropdown" role="button" data-bs-toggle="dropdown">
@@ -183,40 +187,50 @@ if ($id_usuario_nav > 0 && isset($pdo)) {
                         <?php endif; ?>
                     </ul>
                 </li>
+                <?php endif; // Fin permiso Tareas ?>
 
                 <?php 
-                $puede_crear_avisos = tiene_permiso('acceso_avisos_crear', $pdo) || tiene_permiso('acceso_avisos_gestionar', $pdo);
+                // --- MODIFICACIÓN: PROTECCIÓN DE BLOG (AVISOS) ---
+                if (tiene_permiso('ver_avisos', $pdo)): // Nuevo permiso 'ver_avisos'
+                    $puede_crear_avisos = tiene_permiso('acceso_avisos_crear', $pdo) || tiene_permiso('acceso_avisos_gestionar', $pdo);
                 ?>
-                <?php if ($puede_crear_avisos): ?>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle <?php echo (strpos(basename($_SERVER['PHP_SELF']), 'avisos_') !== false || basename($_SERVER['PHP_SELF']) == 'avisos.php') ? 'active' : ''; ?>"
-                            href="#" id="avisosDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-blog"></i> Blog
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="avisos.php"><i class="fas fa-eye me-2"></i> Ver Blog</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <?php if (tiene_permiso('acceso_avisos_crear', $pdo)): ?>
-                                <li><a class="dropdown-item" href="avisos_crear.php"><i class="fas fa-plus-circle me-2 text-success"></i> Crear Entrada</a></li>
-                            <?php endif; ?>
-                            <?php if (tiene_permiso('acceso_avisos_gestionar', $pdo)): ?>
-                                <li><a class="dropdown-item" href="avisos_lista.php"><i class="fas fa-list-alt me-2 text-warning"></i> Administrar</a></li>
-                            <?php endif; ?>
-                        </ul>
-                    </li>
-                <?php else: ?>
-                    <li class="nav-item">
-                        <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'avisos.php' ? 'active' : ''; ?>" href="avisos.php">
-                            <i class="fas fa-blog"></i> Blog
-                        </a>
-                    </li>
-                <?php endif; ?>
+                    <?php if ($puede_crear_avisos): ?>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle <?php echo (strpos(basename($_SERVER['PHP_SELF']), 'avisos_') !== false || basename($_SERVER['PHP_SELF']) == 'avisos.php') ? 'active' : ''; ?>"
+                                href="#" id="avisosDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-blog"></i> Blog
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="avisos.php"><i class="fas fa-eye me-2"></i> Ver Blog</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <?php if (tiene_permiso('acceso_avisos_crear', $pdo)): ?>
+                                    <li><a class="dropdown-item" href="avisos_crear.php"><i class="fas fa-plus-circle me-2 text-success"></i> Crear Entrada</a></li>
+                                <?php endif; ?>
+                                <?php if (tiene_permiso('acceso_avisos_gestionar', $pdo)): ?>
+                                    <li><a class="dropdown-item" href="avisos_lista.php"><i class="fas fa-list-alt me-2 text-warning"></i> Administrar</a></li>
+                                <?php endif; ?>
+                            </ul>
+                        </li>
+                    <?php else: ?>
+                        <li class="nav-item">
+                            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'avisos.php' ? 'active' : ''; ?>" href="avisos.php">
+                                <i class="fas fa-blog"></i> Blog
+                            </a>
+                        </li>
+                    <?php endif; ?>
+                <?php endif; // Fin permiso Blog ?>
                 
+                <?php 
+                // --- MODIFICACIÓN: PROTECCIÓN DE CHAT ---
+                if (tiene_permiso('acceso_chat', $pdo)): // Nuevo permiso 'acceso_chat'
+                ?>
                 <li class="nav-item">
                     <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'chat.php' ? 'active' : ''; ?>" href="chat.php">
                         <i class="fas fa-comments"></i> Chat
                     </a>
                 </li>
+                <?php endif; // Fin permiso Chat ?>
+
                 <?php if ($mostrar_ascensores): ?>
                 
                 <li class="nav-item dropdown">
@@ -519,7 +533,7 @@ if ($mostrar_navidad_global):
                 if(data.notifications && data.notifications.length > 0) {
                     data.notifications.forEach(n => {
                         const cls = n.leida == 0 ? 'fw-bold bg-light' : '';
-                        list.innerHTML += `<li><a class="dropdown-item ${cls} text-wrap py-2" href="${n.url}" onclick="markRead(${n.id_notificacion})"><div class="small">${n.mensaje}</div><div class="text-muted" style="font-size:0.75rem">${n.fecha_creacion}</div></a></li>`;
+                        list.innerHTML += `<li><a class="dropdown-item ${cls} text-wrap py-2" href="${n.url}" onclick="markRead(${n.id_notificacion})\"><div class="small">${n.mensaje}</div><div class="text-muted" style="font-size:0.75rem">${n.fecha_creacion}</div></a></li>`;
                     });
                 } else {
                     list.innerHTML = '<li class="p-3 text-center text-muted">Sin notificaciones</li>';
